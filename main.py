@@ -23,9 +23,43 @@ except ImportError as e:
     print(f"Path: {os.environ.get('PATH')}")
     sys.exit(1)
 
+def load_stylesheet(qss_file_path):
+    """Load and return the content of a QSS file"""
+    try:
+        with open(qss_file_path, 'r', encoding='utf-8') as file:
+            return file.read()
+    except Exception as e:
+        print(f"Error reading {qss_file_path}: {e}")
+        return ""
+
 def main():
     try:
         app = QApplication(sys.argv)
+        
+        # Apply stylesheet - try multiple possible files
+        style_dir = os.path.join(current_dir, 'app', 'styles')
+        stylesheet_content = ""
+        
+        # Try different possible stylesheet files
+        possible_files = [
+            os.path.join(style_dir, 'main.qss'),
+            os.path.join(style_dir, '__init__.py'),
+            os.path.join(style_dir, 'style.qss')
+        ]
+        
+        for style_file in possible_files:
+            if os.path.exists(style_file):
+                content = load_stylesheet(style_file)
+                if content and not content.startswith("# Empty"):
+                    stylesheet_content = content
+                    print(f"Applied stylesheet from {style_file}")
+                    break
+        
+        if stylesheet_content:
+            app.setStyleSheet(stylesheet_content)
+        else:
+            print("Warning: No valid stylesheet found")
+        
         window = MainWindow()
         window.show()
         # PyQt5 uses exec_() instead of exec()
