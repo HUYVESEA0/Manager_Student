@@ -1,0 +1,2 @@
+# Use PyQt5 instead of PyQt6 for better compatibility
+PyQt5==5.15.9
